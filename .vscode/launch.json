@@ -6,7 +6,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceRoot}/build/debug/myapp_d",
-            "args": [],
+            "args": ["-f eldo@example.com", "-t yo@mama.com", "-p 2525", "ec2-54-148-3-55.us-west-2.compute.amazonaws.com"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
