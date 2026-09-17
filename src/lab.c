@@ -6,6 +6,7 @@
 
 #define BUFFER_SIZE 1024
 
+// GCOVR_EXCL_START
 struct addrinfo *getgetaddrinfo(const char *server, const char *port)
 {
   int s = 0;
@@ -78,9 +79,9 @@ int start_session(const char* server, const char* port)
   socket = connectconnect(address);
 
   return socket;
-}
+} // GCOVR_EXCL_STOP
 
-bool check_status_code(const char* message_in, const char* code_expected)
+bool check_status_code(const char* message_in, const char code_expected[3])
 {
   return (strncmp(message_in, code_expected, 3) == 0);
 }

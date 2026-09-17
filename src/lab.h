@@ -67,7 +67,7 @@ int start_session(const char* server, const char* port);
  * 
  * return true if the status code in the message matches expected
  */
-bool check_status_code(const char* message_in, const char* code_expected);
+bool check_status_code(const char* message_in, const char code_expected[3]);
 
 /**
  * Read a message as a string and check if it is the last line of the message.
@@ -188,22 +188,94 @@ char* prep_data(char* buffer);
 char* prep_bye(char* buffer);
 
 /**
- * Dot stuff a message line that consists of only a '.'
+ * Send the HELO command with an attached host
+ * 
+ * write_msg - [in] callback function that writes to the socket
+ * read_msg - [in] callback function that reads from the socket
+ * socket - [in] the socket to send and read from
+ * helo_host - [in] the host that the message comes from
+ * 
+ * return true if the return code is what is expected (250)
  */
-char* dot_stuff(char* line);
-
 bool send_helo(write_msg_callback write_msg, read_msg_callback read_msg, int socket, char* helo_host);
 
+
+/**
+ * Send the MAIL FROM command with the provided email
+ * 
+ * write_msg - [in] callback function that writes to the socket
+ * read_msg - [in] callback function that reads from the socket
+ * socket - [in] the socket to send and read from
+ * mail_from - [in] the email to send from
+ * 
+ * return true if the return code is what is expected (250)
+ */
 bool send_mail_from(write_msg_callback write_msg, read_msg_callback read_msg, int socket, char* mail_from);
 
+
+/**
+ * Send the RCPT TO command with the provided email
+ * 
+ * write_msg - [in] callback function that writes to the socket
+ * read_msg - [in] callback function that reads from the socket
+ * socket - [in] the socket to send and read from
+ * rcpt_to - [in] the email to send to
+ * 
+ * return true if the return code is what is expected (250)
+ */
 bool send_rcpt_to(write_msg_callback write_msg, read_msg_callback read_msg, int socket, char* rcpt_to);
 
+
+/**
+ * Send the DATA command
+ * 
+ * write_msg - [in] callback function that writes to the socket
+ * read_msg - [in] callback function that reads from the socket
+ * socket - [in] the socket to send and read from
+ * 
+ * return true if the return code is what is expected (354)
+ */
 bool send_data(write_msg_callback write_msg, read_msg_callback read_msg, int socket);
 
+
+/**
+ * Send the QUIT command
+ * 
+ * write_msg - [in] callback function that writes to the socket
+ * read_msg - [in] callback function that reads from the socket
+ * socket - [in] the socket to send and read from
+ * 
+ * return true if the return code is what is expected (221)
+ */
 bool send_bye(write_msg_callback write_msg, read_msg_callback read_msg, int socket);
 
+
+/**
+ * Send the body of the message
+ * 
+ * write_msg - [in] callback function that writes to the socket
+ * read_msg - [in] callback function that reads from the socket
+ * socket - [in] the socket to send and read from
+ * subject - [in] the subject of the message
+ * body - [in] the body of the message
+ * 
+ * return true if the return code is what is expected (250)
+ */
 bool send_body(write_msg_callback write_msg, read_msg_callback read_msg, int socket, char* subject, char* body);
 
+/**
+ * Run a full session sending each command in order, continuing only if the last command passed
+ * 
+ * write_msg - [in] callback function that writes to the socket
+ * read_msg - [in] callback function that reads from the socket
+ * server - [in] server to send the message to
+ * port - [in] port on the server to send to
+ * host - [int] HELO host the message comes from
+ * email_from - [in] email the message comes from
+ * email_to - [in] email the message should go to
+ * subject - [in] subject of the message
+ * body - [in] body of the message
+ */
 int run_session(write_msg_callback write_msg, read_msg_callback read_msg, char* server, char* port, char* host, char* email_from, char* email_to, char* subject, char* body);
 
 #endif // LAB_H
