@@ -8,6 +8,7 @@
 #define BUFFER_SIZE 1024
 
 // GCOVR_EXCL_START
+// Excluded from coverage because they rely on system calls.
 struct addrinfo *getgetaddrinfo(const char *server, const char *port)
 {
   int s = 0;
