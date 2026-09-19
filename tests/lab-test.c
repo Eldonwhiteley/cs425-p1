@@ -83,11 +83,15 @@ void test_check_format(void)
   char* good_format2 = "456-I'm also good format";
   char* bad_format = "I'm bad format";
   char* bad_format2 = "1234 I'm also bad format";
+  char* bad_format3 = "1a3 I'm bad format too";
+  char* bad_format4 = "56b-I'm really bad format";
 
   TEST_ASSERT_TRUE(check_format(good_format));
   TEST_ASSERT_TRUE(check_format(good_format2));
   TEST_ASSERT_FALSE(check_format(bad_format));
   TEST_ASSERT_FALSE(check_format(bad_format2));
+  TEST_ASSERT_FALSE(check_format(bad_format3));
+  TEST_ASSERT_FALSE(check_format(bad_format4));
 }
 
 void test_read_line(void)
