@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <ctype.h>
 
 #define BUFFER_SIZE 1024
 
@@ -91,6 +92,15 @@ bool check_last_line(const char* message_in)
   return (message_in[3] == ' ');
 }
 
+bool check_format(const char* message_in)
+{
+  bool char0valid = (isdigit(message_in[0]) != 0);
+  bool char1valid = (isdigit(message_in[1]) != 0);
+  bool char2valid = (isdigit(message_in[2]) != 0);
+  bool char3valid = (message_in[3] == ' ' || message_in[3] == '-');
+  return (char0valid && char1valid && char2valid && char3valid);
+}
+
 int read_line(read_msg_callback read_msg, int socket, char* buffer, size_t bufferlen)
 {
   return read_msg(socket, buffer, bufferlen);
@@ -102,6 +112,12 @@ int read_reply(read_msg_callback read_msg, int socket, char* buffer, size_t buff
   int ret = 0;
   while(!last_line && ((ret = read_line(read_msg, socket, buffer, bufferlen)) == 0))
   {
+    if(!(check_format(buffer)))
+    {
+      fprintf(stderr, "Message was formatted incorrectly\n");
+      return 1;
+    }
+
     last_line = check_last_line(buffer);
   }
 
@@ -119,6 +135,7 @@ bool send_cmd(write_msg_callback write_msg, read_msg_callback read_msg, int sock
   {
     read_reply(read_msg, socket, buffer, bufferlen);
   }
+
   return check_status_code(buffer, expected_status);
 }
 
@@ -128,7 +145,7 @@ char* prep_msg(char* raw_msg, char* command, char* buffer)
   next_pos = stpcpy(next_pos, command);
   next_pos = stpcpy(next_pos, raw_msg);
   next_pos = stpcpy(next_pos, "\r\n");
-  return next_pos;
+  return buffer;
 }
 
 char* prep_helo(char* raw_msg, char* buffer)
@@ -236,9 +253,9 @@ bool send_body(write_msg_callback write_msg, read_msg_callback read_msg, int soc
   return check_status_code(buffer, "250");
 }
 
-int run_session(write_msg_callback write_msg, read_msg_callback read_msg, char* server, char* port, char* host, char* email_from, char* email_to, char* subject, char* body)
+int run_session(write_msg_callback write_msg, read_msg_callback read_msg, start_session_callback get_socket, char* server, char* port, char* host, char* email_from, char* email_to, char* subject, char* body)
 {
-  int socket = start_session(server, port);
+  int socket = get_socket(server, port);
   if(socket == 0)
   {
     fprintf(stderr, "Error binding socket\n");
@@ -253,7 +270,7 @@ int run_session(write_msg_callback write_msg, read_msg_callback read_msg, char* 
   {
     passed = send_helo(write_msg, read_msg, socket, host);
   } else {
-    fprintf(stderr, "Error sending HELO\n");
+    fprintf(stderr, "Error connecting\n");
     return 2;
   }
 
@@ -261,7 +278,7 @@ int run_session(write_msg_callback write_msg, read_msg_callback read_msg, char* 
   {
     passed = send_mail_from(write_msg, read_msg, socket, email_from);
   } else {
-    fprintf(stderr, "Error sending MAIL FROM\n");
+    fprintf(stderr, "Error sending HELO\n");
     return 2;
   }
 
@@ -269,7 +286,7 @@ int run_session(write_msg_callback write_msg, read_msg_callback read_msg, char* 
   {
     passed = send_rcpt_to(write_msg, read_msg, socket, email_to);
   } else {
-    fprintf(stderr, "Error sending RCPT TO\n");
+    fprintf(stderr, "Error sending MAIL FROM\n");
     return 2;
   }
 
@@ -277,7 +294,7 @@ int run_session(write_msg_callback write_msg, read_msg_callback read_msg, char* 
   {
     passed = send_data(write_msg, read_msg, socket);
   } else {
-    fprintf(stderr, "Error sending DATA\n");
+    fprintf(stderr, "Error sending RCPT TO\n");
     return 2;
   }
 
@@ -285,7 +302,7 @@ int run_session(write_msg_callback write_msg, read_msg_callback read_msg, char* 
   {
     passed = send_body(write_msg, read_msg, socket, subject, body);
   } else {
-    fprintf(stderr, "Error sending message body\n");
+    fprintf(stderr, "Error sending DATA\n");
     return 2;
   }
   
@@ -293,9 +310,16 @@ int run_session(write_msg_callback write_msg, read_msg_callback read_msg, char* 
   {
     passed = send_bye(write_msg, read_msg, socket);
   } else {
-    fprintf(stderr, "Error sending QUIT");
+    fprintf(stderr, "Error sending message body\n");
     return 2;
   }
 
+  if(!passed)
+  {
+    fprintf(stderr, "Error sending QUIT\n");
+    return 2;
+  }
+
+  
   return 0;
 }

@@ -43,11 +43,12 @@ int main(int argc, char* argv[])
     char body[MAX_BODY_SIZE] = "";
     char host[MAX_EMAIL_SIZE] = "localhost";
     char server[MAX_SUBJECT_SIZE] = "";
-    u_int8_t argsErr = 0;
     char port[MAX_EMAIL_SIZE] = "25";
     int opt;
 
-    int socket;
+    uint32_t hiIAmInt = 10;
+
+    u_int8_t argsErr = 0;
 
     char restricted_chars[] = "\r\n";
     char* match = NULL;
@@ -152,5 +153,5 @@ int main(int argc, char* argv[])
     }
 
     /* Open network and send message using lab.h func(s) */
-    return run_session(write_smtp, read_smtp, server, port, host, emailFrom, emailTo, subject, body);
+    return run_session(write_smtp, read_smtp, start_session, server, port, host, emailFrom, emailTo, subject, body);
 }

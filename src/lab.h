@@ -10,6 +10,8 @@ typedef int (*read_msg_callback)(int, char*, size_t);
 
 typedef ssize_t (*write_msg_callback)(int, char*);
 
+typedef int (*start_session_callback)(const char*, const char*);
+
 /**
  * Get and return an addrinfo struct created by getaddrinfo()
  * 
@@ -79,6 +81,15 @@ bool check_status_code(const char* message_in, const char code_expected[3]);
 bool check_last_line(const char* message_in);
 
 /**
+ * Read a message and ensure it adheres to the proper format
+ * 
+ * message_in - [in] message to check
+ * 
+ * return true if format is good
+ */
+bool check_format(const char* message_in);
+
+/**
  * A layer 2 function to read a message line.
  * 
  * read_msg - [in] a callback function that fills the buffer with a message read
@@ -135,7 +146,7 @@ bool send_cmd(write_msg_callback write_msg, read_msg_callback read_msg, int sock
  * command - [in] command type (HELO, MAIL FROM, RCPT TO)
  * buffer - [out] buffer to save the message to
  * 
- * returns a pointer to the terminating null byte of the buffer
+ * returns a pointer to the buffer
  */
 char* prep_msg(char* raw_msg, char* command, char* buffer);
 
@@ -276,6 +287,6 @@ bool send_body(write_msg_callback write_msg, read_msg_callback read_msg, int soc
  * subject - [in] subject of the message
  * body - [in] body of the message
  */
-int run_session(write_msg_callback write_msg, read_msg_callback read_msg, char* server, char* port, char* host, char* email_from, char* email_to, char* subject, char* body);
+int run_session(write_msg_callback write_msg, read_msg_callback read_msg, start_session_callback get_socket, char* server, char* port, char* host, char* email_from, char* email_to, char* subject, char* body);
 
 #endif // LAB_H
