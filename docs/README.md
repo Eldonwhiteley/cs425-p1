@@ -1,68 +1,23 @@
-# Makefile Project Template
+# Project 1 - Complex ;) SMTP Client
 
-This is a simple Makefile project template that can be used to build, test, and
-debug C projects. It includes support for debug builds, sanitizers, and code
-coverage.
+- Name: Eldon Whiteley
+- Email: eldonwhiteley@u.boisestate.edu
+- Class: 434-001
 
-## Tools and Dependencies
+## Known Bugs or Issues
 
-- GNU Make
-- GCC or Clang
-- Address Sanitizer (ASan) for memory error detection
-- gcov and lcov for code coverage
-- gcovr for generating coverage reports
-- pandoc for generating docx reports (optional)
+As of now I am not aware of any bugs. Many of my tests run through good and as many bad paths as I thought
+necessary to ensure the functions work properly. I skipped tests for the thin wrapper functions as they
+would be difficult to force failures on.
 
-## Test Harness
+## Experience
 
-This project uses the Unity Test Framework for unit testing. Refer to the
-[Unity Getting Started Guide](https://github.com/ThrowTheSwitch/Unity/blob/master/docs/UnityGettingStartedGuide.md) for more information on how to write and run tests.
-
-## Example Usage
-
-To build the project run:
-
-```bash
-make all
-```
-To run the executable:
-
-```bash
-./build/release/myapp
-```
-
-To run the unit tests:
-
-```bash
-make check
-```
-
-To see all the configurations, run `make help`
-
-```bash
-Usage: make [target]
-Available targets:
-  debug     - Build the application in debug mode (default)
-  release   - Build the application in release mode
-  test      - Build the unit tests
-  all       - Builds debug, release, and test targets
-  check     - Run tests and check results
-  report    - Generate coverage report after running tests
-  leak      - Check for memory leaks in debug mode
-  clean     - Remove build artifacts
-  print     - Print build variables for MakeFile debugging
-  help      - Show this help message
-```
-
-## VS Code Integration
-
-This project is designed to work well with Visual Studio Code. Configurations
-for debugging the application and unit tests are provided. Read about how to
-use the debugger in the [VS Code documentation](https://code.visualstudio.com/docs/editor/debugging).
-
-## Features
-
-- Build targets for debug and release modes
-- Support for Address Sanitizer (ASan)
-- Code coverage support and report generation
-- Simple structure for organizing source files and build artifacts
+The experience was quite interesting, I learned a lot about SMTP and simple network code. I relied on
+man pages and copied quite a few examples from them to set up the network, connect, create sockets, send
+and read data, and so on. It took quite some time to implement the bigger framework around the read and
+write functions.  
+Using callback functions was new to me as well, it was an interesting way to design for testing and I
+probably could have implemented it in a cleaner way. Maybe I could use a static variable to store the 
+socket and other relevant information, or represent the whole session as a struct and get each member
+by just using `session.mail_from`, `session.socket`, `session->body`. Since it works now I don't plan
+on changing it, but just some thoughts.
