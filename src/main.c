@@ -46,8 +46,6 @@ int main(int argc, char* argv[])
     char port[MAX_EMAIL_SIZE] = "25";
     int opt;
 
-    uint32_t hiIAmInt = 10;
-
     u_int8_t argsErr = 0;
 
     char restricted_chars[] = "\r\n";
